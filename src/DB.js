@@ -4,6 +4,7 @@ import {database} from './config';
 import {styles} from './style';
 import TextField from './components/TextField/index';
 import Button from './components/Button/index';
+import firebase from '@react-native-firebase/app';
 
 export default function DB() {
   const [name, setName] = useState('');
@@ -11,14 +12,16 @@ export default function DB() {
   const [data, setData] = useState([]);
 
   const addUser = () => {
-    const temp = database().ref('users');
-    // temp.set({
-    //   id: 101,
-    //   name: 'maya',
-    // });
-    if (temp.push({id, name})) {
-      alert('Added Successfully');
-    }
+    database()
+      .ref('users')
+      // .set({
+      //   id: 101,
+      //   name: 'maya',
+      // });
+      .push({id, name});
+
+    // .ref('users/-M_Vh2G_A9XbV3-UsqSp')
+    // .set({id: 102, name: 'jahnavi'});
   };
   const deleteAllUsers = () => {
     database()
@@ -33,28 +36,51 @@ export default function DB() {
       .ref('users/' + id)
       .remove()
       .then(() => {
-        setData(!data);
+        setData({name, id});
       })
       .catch(err => {
         console.log(err);
       });
   };
+
   const updateUser = () => {
-    database()
-      .ref('/users')
-      .update({
-        id: 1,
-        name: 'chhaya',
+    var ref = firebase.database().ref().child('users');
+    var refUserId = ref.orderByChild('id').equalTo(id);
+    refUserId
+      .once('value')
+      .then(function (snapshot) {
+        if (snapshot.hasChildren()) {
+          return snapshot.forEach(function (child) {
+            child.ref.update({id: id, name: name});
+          });
+        } else {
+          return snapshot.ref.push({
+            player: 'any',
+            id: 'any',
+          });
+        }
       })
-      .then(() => console.log('Data updated.'));
+      .then(function () {
+        console.log('update/push done');
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    refUserId.once('value', function (snapshot) {
+      if (snapshot.hasChildren()) {
+        snapshot.forEach(function (child) {
+          child.ref.update(name);
+        });
+      }
+    });
   };
+
   return (
     <>
       <View
         style={{
           flex: 1,
           width: '100%',
-          backgroundColor: 'pink',
           paddingVertical: 30,
         }}>
         <TextField
