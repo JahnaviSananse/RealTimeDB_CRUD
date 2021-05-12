@@ -32,15 +32,39 @@ export default function DB() {
       });
   };
   const deleteUser = () => {
-    database()
-      .ref('users/' + id)
-      .remove()
-      .then(() => {
-        setData({name, id});
+    // database()
+    //   .ref('users/' + id)
+    //   .remove()
+    //   .then(() => {
+    //     setData({name, id});
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   });
+    var ref = firebase.database().ref().child('users');
+    var refUserId = ref.orderByChild('id').equalTo(id);
+    refUserId
+      .once('value')
+      .then(function (snapshot) {
+        if (snapshot.hasChildren()) {
+          return snapshot.forEach(function (child) {
+            child.ref.remove({id: id, name: name});
+          });
+        }
       })
-      .catch(err => {
-        console.log(err);
+      .then(function () {
+        console.log('delete done');
+      })
+      .catch(function (error) {
+        console.log(error);
       });
+    refUserId.once('value', function (snapshot) {
+      if (snapshot.hasChildren()) {
+        snapshot.forEach(function (child) {
+          child.ref.remove();
+        });
+      }
+    });
   };
 
   const updateUser = () => {
