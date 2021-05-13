@@ -11,6 +11,8 @@ export default function DB() {
   const [id, setId] = useState('');
   const [data, setData] = useState([]);
 
+  //Add data to database -> .set is used to just set value -> .push is used to add values into stack
+
   const addUser = () => {
     database()
       .ref('users')
@@ -23,6 +25,9 @@ export default function DB() {
     // .ref('users/-M_Vh2G_A9XbV3-UsqSp')
     // .set({id: 102, name: 'jahnavi'});
   };
+
+  //delete all users from database
+
   const deleteAllUsers = () => {
     database()
       .ref('users')
@@ -31,16 +36,10 @@ export default function DB() {
         setData([]);
       });
   };
+
+  //delete particular user from database
+
   const deleteUser = () => {
-    // database()
-    //   .ref('users/' + id)
-    //   .remove()
-    //   .then(() => {
-    //     setData({name, id});
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   });
     var ref = firebase.database().ref().child('users');
     var refUserId = ref.orderByChild('id').equalTo(id);
     refUserId
@@ -66,6 +65,8 @@ export default function DB() {
       }
     });
   };
+
+  //update particular user from database
 
   const updateUser = () => {
     var ref = firebase.database().ref().child('users');
@@ -122,24 +123,11 @@ export default function DB() {
           placeholder="enter your name here..."
         />
 
-        <Button
-          title="ADD TO DATABASE"
-          onPress={() => addUser()}
-          //   onPress={() => {
-          //     // setData({...data, id, name});
-          //     // setData(...data, {id, name});
-          //     setData(oldArray => [...oldArray, {name, id}]);
-          //   }}
-        />
+        <Button title="ADD TO DATABASE" onPress={() => addUser()} />
         <Button title="DELETE ALL DATA" onPress={() => deleteAllUsers()} />
         <Button title="DELETE DATA" onPress={() => deleteUser()} />
         <Button title="UPDATE DATA" onPress={() => updateUser()} />
       </View>
-      {/* <View style={{flex: 0.6, width: '100%', backgroundColor: 'yellow'}}>
-        <Text>
-          {data[0]?.id} {data[0]?.name}
-        </Text>
-      </View> */}
     </>
   );
 }
